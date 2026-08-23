@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="麦麦的工作台">
+<meta name="theme-color" content="#EAF4FA">
+<meta name="format-detection" content="telephone=no">
+<title>麦麦的工作台 · Maimai</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+:root{
+  --sky:#6FB3D8;        /* 主浅蓝 */
+  --sky-light:#C5E1F0;  /* 浅蓝浅 */
+  --sky-pale:#EAF4FA;   /* 极浅蓝 */
+  --bg-grad:linear-gradient(180deg,#EAF6FD 0%,#F5F8FB 100%);
+  --gray:#6B7A8D;       /* 高级灰 */
+  --text:#3A4A5A;
+  --text-light:#8A9BAE;
+  --card:#FFFFFF;
+  --pink:#EAA8B5;       /* 腮红粉 */
+  --pink-soft:#FCE5EA;
+  --mint:#A8E6CF;
+  --yellow:#FFE3A8;
+  --purple:#D7BDE2;
+  --orange:#FFCBA4;
+  --green:#5DC593;
+  --shadow:0 4px 18px rgba(111,179,216,0.10);
+  --shadow-strong:0 8px 28px rgba(111,179,216,0.16);
+  --radius:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;background:var(--bg-grad);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh;}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+button{font-family:inherit;}
+
+/* 启动页 */
+#splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(180deg,#DDEEF8 0%,#F0F6FA 60%,#FAFCFE 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 32px;transition:opacity .5s ease;}
+#splash.hide{opacity:0;pointer-events:none;}
+#splash .splash-char{width:240px;height:240px;object-fit:contain;margin-bottom:18px;filter:drop-shadow(0 8px 22px rgba(111,179,216,0.35));}
+#splash h1{font-size:30px;margin:6px 0;font-weight:800;background:linear-gradient(135deg,var(--sky),#4F8CB0);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:1px;}
+#splash .splash-date{font-size:14px;color:var(--gray);margin:6px 0 14px;letter-spacing:1.5px;}
+#splash .splash-quote{font-size:14px;color:var(--text);line-height:1.7;background:rgba(255,255,255,0.75);border:1px solid var(--sky-light);border-radius:14px;padding:12px 18px;margin:0 0 24px;max-width:300px;backdrop-filter:blur(6px);}
+#splash .splash-btn{background:linear-gradient(135deg,var(--sky),#4F8CB0);color:#fff;border:none;padding:14px 50px;border-radius:28px;font-size:16px;font-weight:700;letter-spacing:3px;box-shadow:0 8px 20px rgba(111,179,216,0.4);cursor:pointer;transition:transform .15s;}
+#splash .splash-btn:active{transform:scale(0.96);}
+#splash .splash-stars{position:absolute;font-size:24px;opacity:.55;animation:twinkle 2.2s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:.9;transform:scale(1.2);}}
+
+/* 顶部栏 */
+.topbar{position:sticky;top:env(safe-area-inset-top);z-index:50;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,225,240,0.5);padding:10px 14px;display:flex;align-items:center;gap:12px;padding-top:calc(10px + env(safe-area-inset-top));}
+.topbar .menu-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:10px;font-size:22px;color:var(--gray);cursor:pointer;flex-shrink:0;}
+.topbar .menu-btn:active{background:var(--sky-pale);}
+.topbar .topbar-title{font-size:16px;font-weight:800;color:var(--text);flex:1;display:flex;align-items:center;gap:6px;}
+.topbar .topbar-title .top-icon{width:26px;height:26px;object-fit:contain;}
+.topbar .topbar-date{font-size:11px;color:var(--text-light);font-weight:600;}
+
+/* 侧边栏 */
+.sidebar-mask{position:fixed;inset:0;background:rgba(58,74,90,0.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;}
+.sidebar-mask.show{opacity:1;pointer-events:auto;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;max-width:80vw;background:linear-gradient(180deg,#FFFFFF 0%,#F2F8FC 100%);z-index:101;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:0 0 30px rgba(58,74,90,0.2);padding-top:env(safe-area-inset-top);overflow-y:auto;}
+.sidebar.show{transform:translateX(0);}
+.sidebar-header{padding:20px 18px 12px;border-bottom:1px solid var(--sky-pale);}
+.sidebar-header h2{font-size:20px;margin:0;font-weight:800;background:linear-gradient(135deg,var(--sky),#4F8CB0);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.sidebar-header p{font-size:11px;color:var(--text-light);margin:2px 0 0;letter-spacing:1px;}
+.sidebar-nav{flex:1;padding:10px 0;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 18px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;}
+.nav-item:active{background:var(--sky-pale);}
+.nav-item.active{background:linear-gradient(90deg,var(--sky-pale) 0%,transparent 100%);border-left-color:var(--sky);}
+.nav-item .ni-icon{width:38px;height:38px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(111,179,216,0.2));transition:transform .2s;}
+.nav-item.active .ni-icon{transform:scale(1.1);}
+.nav-item .ni-text{font-size:14px;font-weight:600;color:var(--text);}
+.nav-item .ni-text small{display:block;font-size:10px;color:var(--text-light);font-weight:500;margin-top:1px;}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--sky-pale);font-size:11px;color:var(--text-light);text-align:center;}
+
+/* 主内容区 */
+.main{padding:14px 14px 30px;max-width:480px;margin:0 auto;}
+.page{display:none;animation:fadeIn .25s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* 通用卡片 */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid rgba(197,225,240,0.4);}
+.card-title{font-size:15px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.card-sub{font-size:11px;color:var(--text-light);margin-top:-6px;margin-bottom:10px;}
+
+/* 首页 */
+.greet-card{background:linear-gradient(135deg,#FFFFFF 0%,#EAF6FD 100%);border-radius:var(--radius);padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);border:1px solid rgba(197,225,240,0.5);}
+.greet-card .greet-char{width:84px;height:84px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 4px 10px rgba(111,179,216,0.25));}
+.greet-card .greet-text{flex:1;min-width:0;}
+.greet-card h2{font-size:19px;font-weight:800;margin:0;background:linear-gradient(135deg,var(--sky),#4F8CB0);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.greet-card .greet-date{font-size:11px;color:var(--gray);margin:3px 0 5px;font-weight:600;}
+.greet-card .greet-sub{font-size:12px;color:var(--text);line-height:1.5;}
+
+/* 打卡网格 */
+.checkin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.checkin-item{background:var(--card);border-radius:14px;padding:10px 4px;text-align:center;box-shadow:var(--shadow);border:1px solid rgba(197,225,240,0.4);cursor:pointer;transition:transform .15s;}
+.checkin-item:active{transform:scale(0.95);}
+.checkin-item.done{background:linear-gradient(135deg,var(--sky-pale) 0%,#FFFFFF 100%);border-color:var(--sky);}
+.checkin-item .ci-icon{font-size:22px;display:block;margin-bottom:3px;}
+.checkin-item .ci-name{font-size:11px;font-weight:700;color:var(--text);display:block;}
+.checkin-item .ci-status{font-size:9px;color:var(--text-light);display:block;margin-top:1px;}
+.checkin-item.done .ci-status{color:var(--sky);font-weight:700;}
+
+/* 倒计时 */
+.countdown-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.countdown-card{background:linear-gradient(135deg,var(--sky) 0%,#5BA0C7 100%);color:#fff;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-strong);position:relative;overflow:hidden;}
+.countdown-card .cd-label{font-size:11px;opacity:.85;font-weight:600;display:flex;align-items:center;gap:4px;}
+.countdown-card .cd-num{font-size:30px;font-weight:800;margin:4px 0;letter-spacing:1px;}
+.countdown-card .cd-target{font-size:10px;opacity:.8;}
+
+/* 任务/饮食/运动 卡片内输入栏 */
+.add-row{display:flex;gap:6px;margin-bottom:10px;}
+.add-row input{flex:1;padding:9px 12px;border:1px solid var(--sky-light);border-radius:12px;font-size:13px;background:var(--sky-pale);color:var(--text);outline:none;transition:border .15s;}
+.add-row input:focus{border-color:var(--sky);background:#fff;}
+.add-row input[type=time]{max-width:110px;flex:0 0 auto;}
+.add-row select{padding:9px 10px;border:1px solid var(--sky-light);border-radius:12px;font-size:13px;background:var(--sky-pale);color:var(--text);outline:none;cursor:pointer;}
+.add-btn{padding:9px 18px;background:linear-gradient(135deg,var(--sky),#4F8CB0);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.add-btn:active{transform:scale(0.96);}
+
+/* 任务列表 */
+.task-item{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #F0F4F7;}
+.task-item:last-child{border-bottom:none;}
+.task-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--sky-light);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:13px;color:#fff;transition:all .15s;}
+.task-check.done{background:linear-gradient(135deg,var(--sky),#4F8CB0);border-color:var(--sky);}
+.task-time{font-size:10px;color:var(--text-light);background:var(--sky-pale);padding:2px 7px;border-radius:8px;font-weight:600;}
+.task-item.done .ti-text{text-decoration:line-through;color:var(--text-light);}
+.task-del{color:var(--text-light);font-size:14px;cursor:pointer;padding:2px 6px;}
+
+/* 进度条 */
+.progress-bar{height:8px;background:var(--sky-pale);border-radius:4px;overflow:hidden;margin:6px 0 4px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--sky),#4F8CB0);border-radius:4px;transition:width .35s;}
+.progress-text{font-size:11px;color:var(--gray);font-weight:600;display:flex;justify-content:space-between;}
+
+/* 看板 */
+.kanban-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.kanban-col{background:var(--sky-pale);border-radius:10px;padding:8px;min-height:60px;}
+.kanban-title{font-size:10px;font-weight:700;color:var(--gray);margin-bottom:4px;text-align:center;letter-spacing:.5px;}
+.kanban-card{background:#fff;border-radius:6px;padding:5px 7px;font-size:10px;color:var(--text);margin-bottom:3px;box-shadow:0 1px 3px rgba(111,179,216,0.1);}
+
+/* 饮食 */
+.meal-tabs{display:flex;gap:4px;margin-bottom:10px;}
+.meal-tab{flex:1;padding:8px 0;text-align:center;background:var(--sky-pale);border-radius:10px;font-size:12px;font-weight:700;color:var(--text-light);cursor:pointer;border:1px solid transparent;}
+.meal-tab.active{background:#fff;color:var(--sky);border-color:var(--sky);box-shadow:var(--shadow);}
+.water-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin:8px 0;}
+.water-cup{aspect-ratio:1;border-radius:8px;background:var(--sky-pale);border:1.5px solid var(--sky-light);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;}
+.water-cup.filled{background:linear-gradient(135deg,var(--sky),#4F8CB0);border-color:var(--sky);color:#fff;}
+.food-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.food-item{background:var(--card);border-radius:12px;padding:10px 4px;text-align:center;box-shadow:var(--shadow);}
+.food-item .fi-icon{font-size:24px;}
+.food-item .fi-name{font-size:11px;font-weight:700;color:var(--text);margin-top:2px;}
+.food-item .fi-desc{font-size:9px;color:var(--text-light);}
+
+/* 资源项 */
+.res-item{display:flex;align-items:center;gap:9px;padding:8px;background:var(--sky-pale);border-radius:10px;margin-bottom:5px;text-decoration:none;color:var(--text);}
+.res-item:last-child{margin-bottom:0;}
+.res-icon{width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.res-info{flex:1;min-width:0;}
+.res-name{font-size:12px;font-weight:700;}
+.res-desc{font-size:10px;color:var(--text-light);margin-top:1px;line-height:1.4;}
+
+/* 标签 */
+.tag{display:inline-block;padding:3px 8px;border-radius:8px;font-size:10px;font-weight:700;margin:2px 3px 2px 0;}
+.tag-pink{background:var(--pink-soft);color:#B14F62;}
+.tag-mint{background:#D8F4E8;color:#2F8665;}
+.tag-yellow{background:#FFF1CC;color:#A07A20;}
+.tag-sky{background:var(--sky-pale);color:#366C8A;}
+.tag-purple{background:#EBDDF4;color:#7A4F9D;}
+
+/* 标签切换 (考试/备课) */
+.tab-row{display:flex;gap:6px;margin-bottom:12px;background:var(--sky-pale);padding:4px;border-radius:14px;}
+.tab-row .ex-tab,.tab-row .tt,.tab-row .lt{flex:1;padding:8px 0;text-align:center;font-size:12px;font-weight:700;color:var(--text-light);border-radius:10px;cursor:pointer;transition:all .15s;}
+.tab-row .ex-tab.active,.tab-row .tt.active,.tab-row .lt.active{background:#fff;color:var(--sky);box-shadow:var(--shadow);}
+.exam-content,.lesson-content{display:none;}
+.exam-content.show,.lesson-content.show{display:block;}
+
+/* 时间线 */
+.timeline{padding-left:18px;border-left:2px solid var(--sky-light);margin:8px 0 4px;}
+.tl-item{position:relative;padding:4px 0 10px 6px;}
+.tl-item:before{content:'';position:absolute;left:-23px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--sky);border:2px solid #fff;box-shadow:0 0 0 2px var(--sky-light);}
+.tl-date{font-size:10px;color:var(--sky);font-weight:700;letter-spacing:.5px;}
+.tl-title{font-size:13px;font-weight:700;color:var(--text);margin:1px 0;}
+.tl-desc{font-size:11px;color:var(--text-light);line-height:1.5;}
+
+/* 阶段卡 */
+.phase-card{border-left:3px solid var(--sky);}
+.phase-card .pc-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.phase-card .pc-badge{background:linear-gradient(135deg,var(--sky),#4F8CB0);color:#fff;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;}
+
+/* 提升卡片 */
+.uplift-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.uplift-card{border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.6);transition:transform .15s;box-shadow:var(--shadow);}
+.uplift-card:active{transform:scale(0.97);}
+.uplift-card.selected{outline:2.5px solid var(--sky);}
+.uplift-card .uc-icon{font-size:30px;margin-bottom:4px;}
+.uplift-card .uc-name{font-size:13px;font-weight:800;color:var(--text);}
+.uplift-card .uc-desc{font-size:10px;color:var(--text-light);margin-top:2px;}
+.uplift-detail{display:none;margin-top:10px;}
+.uplift-detail.show{display:block;}
+
+/* 单词卡 */
+.word-card{background:linear-gradient(135deg,#FFFFFF 0%,#EAF6FD 100%);border-radius:var(--radius);padding:22px 16px;margin-bottom:12px;text-align:center;box-shadow:var(--shadow-strong);border:1px solid var(--sky-light);}
+.word-en{font-size:30px;font-weight:800;color:var(--text);letter-spacing:1px;margin-bottom:4px;}
+.word-ph{font-size:14px;color:var(--sky);font-weight:600;margin-bottom:8px;}
+.word-cn{font-size:14px;color:var(--text);margin-bottom:8px;line-height:1.5;}
+.word-ex{font-size:12px;color:var(--gray);font-style:italic;line-height:1.5;padding:8px 12px;background:rgba(255,255,255,0.6);border-radius:10px;display:inline-block;}
+.word-nav{display:flex;gap:6px;margin:10px 0;}
+.word-nav button{flex:1;padding:10px;background:var(--sky-pale);border:1px solid var(--sky-light);border-radius:10px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;}
+.word-nav button.primary{background:linear-gradient(135deg,var(--sky),#4F8CB0);color:#fff;border:none;}
+.word-nav button:active{transform:scale(0.97);}
+
+/* 统计 */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-card{background:var(--card);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow);}
+.stat-card .sc-num{font-size:22px;font-weight:800;color:var(--sky);}
+.stat-card .sc-lbl{font-size:10px;color:var(--text-light);margin-top:2px;}
+
+/* 运动项 */
+.exercise-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--sky-pale);border-radius:12px;margin-bottom:6px;}
+.exercise-item .ei-thumb{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--sky),var(--sky-light));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.exercise-item .ei-info{flex:1;min-width:0;}
+.exercise-item .ei-name{font-size:13px;font-weight:700;color:var(--text);}
+.exercise-item .ei-desc{font-size:10px;color:var(--text-light);margin-top:1px;}
+.exercise-item .ei-link{font-size:10px;color:var(--sky);font-weight:700;text-decoration:none;margin-top:2px;display:inline-block;}
+.exercise-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--sky-light);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:13px;color:#fff;transition:all .15s;}
+.exercise-check.done{background:linear-gradient(135deg,var(--sky),#4F8CB0);border-color:var(--sky);}
+
+.ex-days{display:flex;justify-content:space-between;margin-bottom:12px;background:var(--sky-pale);padding:8px;border-radius:12px;}
+.ex-day{flex:1;text-align:center;padding:6px 0;border-radius:8px;font-size:10px;color:var(--text-light);font-weight:600;}
+.ex-day.active{background:#fff;color:var(--sky);box-shadow:var(--shadow);}
+
+/* 鸡汤 */
+.soup-card{background:linear-gradient(135deg,#FFFFFF 0%,#EAF6FD 100%);border-radius:var(--radius);padding:24px 18px;margin-bottom:12px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--sky-light);position:relative;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.soup-card .soup-icon{font-size:36px;margin-bottom:10px;}
+.soup-card .soup-text{font-size:16px;line-height:1.8;color:var(--text);font-weight:600;max-width:280px;}
+.soup-card .soup-from{margin-top:10px;font-size:11px;color:var(--gray);letter-spacing:1px;}
+.soup-actions{display:flex;gap:8px;margin-bottom:14px;}
+.soup-btn{flex:1;padding:11px;background:var(--card);border:1px solid var(--sky-light);border-radius:10px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;box-shadow:var(--shadow);}
+.soup-btn:active{transform:scale(0.97);}
+.soup-btn.primary{background:linear-gradient(135deg,var(--sky),#4F8CB0);color:#fff;border:none;}
+.soup-fav{background:linear-gradient(135deg,var(--pink-soft),#fff);border-color:var(--pink);color:#B14F62;}
+
+/* 书 */
+.book-cat-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.book-cat-tabs::-webkit-scrollbar{display:none;}
+.bct{flex-shrink:0;padding:6px 12px;background:var(--sky-pale);border-radius:14px;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;border:1px solid transparent;}
+.bct.active{background:#fff;color:var(--sky);border-color:var(--sky);box-shadow:var(--shadow);}
+.book-card{display:flex;gap:10px;background:var(--card);border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid rgba(197,225,240,0.4);}
+.book-cover{width:62px;height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;box-shadow:0 2px 6px rgba(58,74,90,0.15);}
+.book-info{flex:1;min-width:0;}
+.book-info .bi-title{font-size:13px;font-weight:800;color:var(--text);}
+.book-info .bi-author{font-size:10px;color:var(--gray);margin:1px 0 4px;}
+.book-info .bi-desc{font-size:11px;color:var(--text);line-height:1.5;}
+.book-info .bi-advice{font-size:10px;color:var(--text-light);margin-top:3px;line-height:1.4;font-style:italic;}
+.book-info .bi-link{font-size:11px;color:var(--sky);font-weight:700;text-decoration:none;margin-top:4px;display:inline-block;}
+
+/* 财务 */
+.fin-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.fin-item{background:var(--card);border-radius:12px;padding:10px;text-align:center;box-shadow:var(--shadow);}
+.fin-item .fi-label{font-size:10px;color:var(--text-light);}
+.fin-item .fi-val{font-size:15px;font-weight:800;margin-top:3px;}
+.record-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #F0F4F7;}
+.record-item:last-child{border-bottom:none;}
+.record-item .ri-amount{font-size:13px;font-weight:800;}
+
+/* 撒花 */
+.confetti{position:fixed;top:-30px;font-size:22px;pointer-events:none;z-index:9999;animation:fall 1.6s ease-out forwards;}
+@keyframes fall{to{transform:translateY(100vh) rotate(360deg);opacity:0;}}
+
+/* 助教按钮 */
+.voice-btn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--sky),#4F8CB0);color:#fff;border:none;font-size:20px;box-shadow:0 6px 16px rgba(111,179,216,0.4);cursor:pointer;z-index:40;display:flex;align-items:center;justify-content:center;}
+
+/* 字体 */
+.cute{font-family:"Hiragino Maru Gothic ProN","PingFang SC",sans-serif;font-weight:600;}
+
+/* 适配 */
+@media (min-width:480px){
+  .main{max-width:520px;padding:18px 18px 40px;}
+}
+@media (min-width:768px){
+  body{display:flex;flex-direction:column;}
+  .topbar{position:fixed;left:0;right:0;}
+  .sidebar{width:240px;}
+}
+</style>
+</head>
+<body>
+
+<!-- 启动页 -->
+<div id="splash">
+  <span class="splash-stars" style="left:8%;top:14%">✨</span>
+  <span class="splash-stars" style="right:9%;top:18%;animation-delay:.4s">⭐</span>
+  <span class="splash-stars" style="left:10%;bottom:18%;animation-delay:.8s">🌟</span>
+  <span class="splash-stars" style="right:12%;bottom:24%;animation-delay:1.2s">💫</span>
+  <img src="assets/dimoo-splash.png" alt="Dimoo" class="splash-char">
+  <h1>嗨，Ruby</h1>
+  <div class="splash-date" id="splashDate">2026年8月9日 · 周六</div>
+  <div class="splash-quote" id="splashQuote">每一天都值得被认真对待 ✨</div>
+  <button class="splash-btn" onclick="closeSplash()">进入工作台 →</button>
+</div>
+
+<!-- 侧边栏蒙层 -->
+<div class="sidebar-mask" id="mask" onclick="toggleSidebar()"></div>
+
+<!-- 侧边栏 -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>🌊 麦麦的工作台</h2>
+    <p>MAIMAI · 2026</p>
+  </div>
+  <nav class="sidebar-nav" id="nav"></nav>
+  <div class="sidebar-footer">v1.0 · Dimoo × 麦麦</div>
+</aside>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <button class="menu-btn" onclick="toggleSidebar()">≡</button>
+  <div class="topbar-title"><img class="top-icon" id="topIcon" src="assets/dimoo-home.png" alt=""><span id="topTitle">首页</span></div>
+  <div class="topbar-date" id="topDate"></div>
+</div>
+
+<!-- 主区 -->
+<main class="main">
+  <!-- 1. 首页 -->
+  <div class="page active" id="page-home">
+    <div class="greet-card">
+      <img class="greet-char" src="assets/dimoo-home.png" alt="">
+      <div class="greet-text">
+        <h2>嗨，Ruby ✨</h2>
+        <div class="greet-date" id="homeDate"></div>
+        <div class="greet-sub" id="homeSub">愿你今天的每一步都温柔有力</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:14px">
+      <div class="card-title">🌅 今日打卡</div>
+      <div class="checkin-grid" id="checkinGrid"></div>
+    </div>
+
+    <div class="countdown-row">
+      <div class="countdown-card">
+        <div class="cd-label">✈️ 泰国之旅</div>
+        <div class="cd-num" id="cdThailand">--</div>
+        <div class="cd-target">目标 8月9日</div>
+      </div>
+      <div class="countdown-card" style="background:linear-gradient(135deg,#EAA8B5 0%,#D88091 100%)">
+        <div class="cd-label">🎯 8.31 目标</div>
+        <div class="cd-num" id="cdAug31">--</div>
+        <div class="cd-target">个人重要节点</div>
+      </div>
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg,var(--sky-pale) 0%,#fff 100%);text-align:center;padding:20px 16px">
+      <div style="font-size:12px;color:var(--gray);letter-spacing:1.5px;margin-bottom:6px">— 今日鸡汤 —</div>
+      <div id="homeQuote" style="font-size:15px;line-height:1.8;font-weight:600;color:var(--text)"></div>
+      <button class="soup-btn" style="margin-top:10px;display:inline-block" onclick="gotoPage('soup')">换一句 →</button>
+    </div>
+  </div>
+
+  <!-- 2. 每日计划 -->
+  <div class="page" id="page-plan">
+    <div class="card">
+      <div class="card-title">📋 今日任务 <span style="margin-left:auto;font-size:11px;color:var(--gray)" id="taskProgressText">0/0</span></div>
+      <div class="add-row">
+        <input type="text" id="taskInput" placeholder="今天要做什么？" maxlength="40">
+        <input type="time" id="taskTime">
+        <button class="add-btn" onclick="addTask()">添加</button>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="taskProgress" style="width:0%"></div></div>
+      <div id="taskList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗂️ 看板</div>
+      <div class="kanban-row">
+        <div class="kanban-col"><div class="kanban-title">今 日</div><div id="kbToday"></div></div>
+        <div class="kanban-col"><div class="kanban-title">本 周</div><div id="kbWeek"></div></div>
+        <div class="kanban-col"><div class="kanban-title">长 期</div><div id="kbLong"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 每日饮食 -->
+  <div class="page" id="page-diet">
+    <div class="card">
+      <div class="card-title">🍽️ 三餐记录</div>
+      <div class="meal-tabs">
+        <div class="meal-tab active" onclick="switchMeal(this,'早')">🌅 早</div>
+        <div class="meal-tab" onclick="switchMeal(this,'中')">☀️ 中</div>
+        <div class="meal-tab" onclick="switchMeal(this,'晚')">🌙 晚</div>
+      </div>
+      <div class="add-row">
+        <input type="text" id="mealInput" placeholder="吃了什么？">
+        <button class="add-btn" onclick="addMeal()">记</button>
+      </div>
+      <div id="mealList" style="font-size:12px;color:var(--text);min-height:30px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💧 今日饮水 <span style="margin-left:auto;font-size:11px;color:var(--sky);font-weight:700" id="waterCount">0/8 杯</span></div>
+      <div class="water-grid" id="waterGrid"></div>
+      <div style="font-size:10px;color:var(--text-light);text-align:center;margin-top:6px">每杯 ~250ml，目标 2000ml</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🥗 推荐健康食物</div>
+      <div class="food-grid" id="foodGrid"></div>
+    </div>
+  </div>
+
+  <!-- 4. 提升自己 -->
+  <div class="page" id="page-uplift">
+    <div class="card">
+      <div class="card-title">💎 自我提升方向</div>
+      <div class="uplift-grid" id="upliftGrid"></div>
+      <div class="uplift-detail" id="upliftDetail"></div>
+    </div>
+  </div>
+
+  <!-- 5. 考试计划 -->
+  <div class="page" id="page-exam">
+    <div class="tab-row">
+      <div class="ex-tab active" onclick="switchExam('teacher',this)">📚 教师编</div>
+      <div class="ex-tab" onclick="switchExam('civil',this)">🏛️ 公务员</div>
+    </div>
+    <div class="exam-content show" id="exam-teacher"></div>
+    <div class="exam-content" id="exam-civil"></div>
+  </div>
+
+  <!-- 6. 英语学习 -->
+  <div class="page" id="page-english">
+    <div class="stats-row">
+      <div class="stat-card"><div class="sc-num" id="wsToday">0</div><div class="sc-lbl">今日单词</div></div>
+      <div class="stat-card"><div class="sc-num" id="wsTotal">0</div><div class="sc-lbl">累计</div></div>
+      <div class="stat-card"><div class="sc-num" id="wsStreak">0</div><div class="sc-lbl">连续天数</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="wordProgress" style="width:0%"></div></div>
+    <div style="font-size:10px;color:var(--gray);text-align:right;margin-bottom:10px">目标 3000 词</div>
+
+    <div class="word-card">
+      <div class="word-en" id="wordEn">--</div>
+      <div class="word-ph" id="wordPh">--</div>
+      <div class="word-cn" id="wordCn">--</div>
+      <div class="word-ex" id="wordEx">--</div>
+    </div>
+    <div class="word-nav">
+      <button onclick="speakWord()">🔊 朗读</button>
+      <button onclick="speakWordSlow()">🐢 慢速</button>
+      <button onclick="prevWord()">← 上一个</button>
+      <button onclick="nextWord()">下一个 →</button>
+    </div>
+    <button class="soup-btn primary" style="width:100%;padding:12px" onclick="markWord()">✓ 记住了 +1</button>
+  </div>
+
+  <!-- 7. 运动减肥 -->
+  <div class="page" id="page-exercise">
+    <div class="card">
+      <div class="card-title">📅 本周计划</div>
+      <div class="ex-days" id="exerciseDays"></div>
+      <div class="progress-bar"><div class="progress-fill" id="exProgress" style="width:0%"></div></div>
+      <div class="progress-text"><span>完成度</span><span id="exProgressText">0/0</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💪 核心训练 (圆肩驼背)</div>
+      <div id="strengthList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🦵 O型腿矫正</div>
+      <div id="legList"></div>
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg,var(--sky-pale) 0%,#fff 100%)">
+      <div class="card-title">📏 你的体态档案</div>
+      <div style="font-size:12px;line-height:1.7">
+        <div>📐 身高 160cm · 体重 102斤</div>
+        <div>🪞 圆肩驼背 + O型腿 + 胸小</div>
+        <div>🎯 建议：每周4次核心训练+3次腿部矫正+胸部训练</div>
+      </div>
+    </div>
+
+    <button class="soup-btn" style="width:100%;padding:12px" onclick="playVoiceReminder()">🎤 运动语音提醒</button>
+  </div>
+
+  <!-- 8. 教师备课 -->
+  <div class="page" id="page-lesson">
+    <div class="tab-row">
+      <div class="lt active" onclick="switchLesson('plan',this)">📋 教案</div>
+      <div class="lt" onclick="switchLesson('ppt',this)">🖥️ PPT</div>
+      <div class="lt" onclick="switchLesson('exercise',this)">✏️ 习题</div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+
+  <!-- 9. 心灵鸡汤 -->
+  <div class="page" id="page-soup">
+    <div class="soup-card">
+      <div class="soup-icon" id="soupIcon">🌷</div>
+      <div class="soup-text" id="soupText">点击下方按钮换一句</div>
+      <div class="soup-from" id="soupFrom">— Dimoo 麦麦</div>
+    </div>
+    <div class="soup-actions">
+      <button class="soup-btn" onclick="prevSoup()">← 上一句</button>
+      <button class="soup-btn primary" onclick="nextSoup()">换一句 ✨</button>
+    </div>
+    <button class="soup-btn soup-fav" style="width:100%;padding:12px" onclick="toggleFav()">⭐ 收藏这句</button>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">⭐ 我的收藏</div>
+      <div id="favList" style="font-size:12px;color:var(--text);line-height:1.8"></div>
+    </div>
+  </div>
+
+  <!-- 10. 书籍推荐 -->
+  <div class="page" id="page-books">
+    <div class="book-cat-tabs" id="bookCatTabs"></div>
+    <div id="bookList"></div>
+  </div>
+
+  <!-- 11. 变大胸 -->
+  <div class="page" id="page-chest">
+    <div class="card">
+      <div class="card-title">💗 胸部训练</div>
+      <div id="chestExList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥑 推荐食物</div>
+      <div class="food-grid" id="chestFoodGrid"></div>
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,var(--pink-soft) 0%,#fff 100%)">
+      <div class="card-title">💆 日常按摩手法</div>
+      <div style="font-size:12px;line-height:1.8">
+        <div>🌸 洗澡时从胸部下沿往锁骨方向画圈按摩 3-5min</div>
+        <div>🌸 配合身体乳或精油，由外向内打圈</div>
+        <div>🌸 每天睡前 5min，坚持一个月有变化</div>
+        <div>🌸 配合扩胸运动+深呼吸，效果更好</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<button class="voice-btn" onclick="playVoiceReminder()" title="语音鼓励">🎤</button>
+
+<script>
+/* ===== 数据 ===== */
+const NAV=[
+  {id:'home',name:'首页',sub:'Hello Ruby',icon:'assets/dimoo-home.png'},
+  {id:'plan',name:'每日计划',sub:'Tasks',icon:'assets/dimoo-plan.png'},
+  {id:'diet',name:'每日饮食',sub:'Meals',icon:'assets/dimoo-diet.png'},
+  {id:'uplift',name:'提升自己',sub:'Self-Growth',icon:'assets/dimoo-uplift.png'},
+  {id:'exam',name:'考试计划',sub:'Exam',icon:'assets/dimoo-exam.png'},
+  {id:'english',name:'英语学习',sub:'English',icon:'assets/dimoo-english.png'},
+  {id:'exercise',name:'运动减肥',sub:'Fitness',icon:'assets/dimoo-exercise.png'},
+  {id:'lesson',name:'教师备课',sub:'Lesson',icon:'assets/dimoo-lesson.png'},
+  {id:'soup',name:'心灵鸡汤',sub:'Quotes',icon:'assets/dimoo-soup.png'},
+  {id:'books',name:'书籍推荐',sub:'Books',icon:'assets/dimoo-books.png'},
+  {id:'chest',name:'变大胸',sub:'Chest',icon:'assets/dimoo-chest.png'},
+];
+
+const SOUPS=[
+  {t:'你不需要很厉害才能开始，你需要开始才能很厉害。',f:'Ruby·日签'},
+  {t:'每一个不曾起舞的日子，都是对生命的辜负。',f:'尼采'},
+  {t:'最好的投资，是投资自己。',f:'巴菲特'},
+  {t:'慢慢来，比较快。',f:'Ruby'},
+  {t:'你今天受的苦，吃的亏，担的责，扛的罪，忍的痛，到最后都会变成光，照亮你的路。',f:'泰戈尔'},
+  {t:'自律给我自由。',f:'Keep'},
+  {t:'与其感慨路难行，不如马上出发。',f:'李白'},
+  {t:'生活不会亏待每一个认真对待它的人。',f:'Ruby·日签'},
+  {t:'你想要的，岁月都会给你，只要你肯等。',f:'亦舒'},
+  {t:'人生没有白走的路，每一步都算数。',f:'李宗盛'},
+  {t:'当你真心渴望某样东西时，整个宇宙都会联合起来帮你完成。',f:'保罗·柯艾略《牧羊少年奇幻之旅》'},
+  {t:'今天比昨天更好，就是进步。',f:'Ruby'},
+  {t:'成为自己的太阳，无须凭借谁的光。',f:'毕淑敏'},
+  {t:'你有多自律，就有多自由。',f:'Ruby'},
+  {t:'别让任何人打乱你的节奏，那不是落后，只是准时。',f:'余世存'},
+  {t:'心怀热爱，奔赴山海。',f:'Ruby'},
+  {t:'永远相信美好的事情即将发生。',f:'阿里巴巴'},
+  {t:'走得很慢没关系，重要的是一直在走。',f:'Ruby'},
+  {t:'身体和灵魂，总有一个要在路上。',f:'《罗马假日》'},
+  {t:'愿你成为自己的太阳，无需凭借谁的光。',f:'毕淑敏'},
+  {t:'做你想做的人，这件事，没有时间的限制。',f:'《本杰明·巴顿奇事》'},
+  {t:'我们比自己想象的更强大，也比自己以为的更接近成功。',f:'Ruby'},
+  {t:'种一棵树最好的时间是十年前，其次是现在。',f:'谚语'},
+  {t:'你的样子里，藏着你走过的路、读过的书、爱过的人。',f:'三毛'},
+  {t:'一个人知道自己为什么而活，就能忍受任何一种生活。',f:'尼采'},
+  {t:'熬过无人问津的日子，才有诗和远方。',f:'Ruby'},
+  {t:'你必须非常努力，才能看起来毫不费力。',f:'刘媛媛'},
+  {t:'时光不会辜负每一个平静努力的人。',f:'Ruby'},
+  {t:'做一个温暖的人，用自己的光照亮自己的路。',f:'Ruby'},
+  {t:'一切都是最好的安排。',f:'丰子恺'},
+  {t:'心若有所向往，何惧道阻且长。',f:'《后汉书》'},
+  {t:'愿你出走半生，归来仍是少年。',f:'苏轼'},
+  {t:'再微小的光，也是光。',f:'《白夜追凶》'},
+  {t:'只问自由，只问盛放，只问深情，只问初心，只问勇敢。',f:'陈坤'},
+  {t:'真正的平静，不是避开车马喧嚣，而是在心中修篱种菊。',f:'林徽因'},
+  {t:'念念不忘，必有回响。',f:'李叔同'},
+  {t:'愿你成为自己喜欢的样子，不畏将来，不念过往，如此安好。',f:'丰子恺'},
+  {t:'人生没有标准答案，适合自己的就是最好的。',f:'Ruby'},
+  {t:'能自己扛的别声张，能自己做的别等待。',f:'Ruby'},
+  {t:'做自己人生的掌舵人，别让任何人替你做主。',f:'Ruby'},
+  {t:'再长的路，一步步也能走完；再短的路，不迈开双脚也无法到达。',f:'汪国真'},
+  {t:'愿你眼里有光，活成想要的模样。',f:'Ruby'},
+  {t:'努力不一定成功，但放弃一定失败。',f:'姚明'},
+  {t:'幸运源于努力，实力源于坚持。',f:'Ruby'},
+  {t:'当下即是最好的安排，未来即是最好的礼物。',f:'Ruby'},
+  {t:'心有猛虎，细嗅蔷薇。',f:'萨松'},
+  {t:'凡是过往，皆为序章。',f:'莎士比亚《暴风雨》'},
+  {t:'唯有时间不可辜负。',f:'Ruby'},
+  {t:'你若盛开，蝴蝶自来；你若精彩，天自安排。',f:'谚语'},
+  {t:'别在该奋斗的年纪选择安逸。',f:'Ruby'},
+];
+
+const UPLIFT = {
+  outer:{name:'外在提升',icon:'✨',desc:'穿搭·护肤·体态',col:'linear-gradient(135deg,#FFE5B4,#FFDAB9)',resources:[
+    {n:'cecici-',d:'158cm小个子穿搭，实用日常',link:'https://search.bilibili.com/all?keyword=cecici穿搭'},
+    {n:'化妆师梓睿',d:'专业化妆师，新手妆容跟练',link:'https://search.bilibili.com/all?keyword=化妆师梓睿新手化妆'},
+    {n:'周六野Zoey',d:'圆肩驼背矫正，超千万播放',link:'https://search.bilibili.com/all?keyword=周六野圆肩驼背矫正'},
+    {n:'帕梅拉Pamela',d:'国际健身博主，体态系列',link:'https://search.bilibili.com/all?keyword=帕梅拉体态训练'},
+  ]},
+  inner:{name:'内在提升',icon:'🧠',desc:'读书·思维·情绪',col:'linear-gradient(135deg,#D7BDE2,#C3AED6)',resources:[
+    {n:'一条正弦',d:'学习方法+读书笔记分享',link:'https://search.bilibili.com/all?keyword=一条正弦读书方法'},
+    {n:'心理学大师课',d:'13位大师讲自我认知与成长',link:'https://search.bilibili.com/all?keyword=心理学自我认知成长课程'},
+    {n:'趁早公众号',d:'王潇创立，女性时间管理',link:'https://www.baidu.com/s?wd=趁早+王潇+女性时间管理'},
+  ]},
+  skill:{name:'技能提升',icon:'🎯',desc:'英语·PPT·写作',col:'linear-gradient(135deg,#C5E1F0,#A0D8EF)',resources:[
+    {n:'FanfaniShare',d:'TESOL硕士，英语口语系统教学',link:'https://search.bilibili.com/all?keyword=FanfaniShare英语口语'},
+    {n:'秋叶PPT',d:'国内PPT教学头部品牌',link:'https://search.bilibili.com/all?keyword=秋叶PPT教程'},
+    {n:'TED演讲',d:'官方B站频道，演讲技巧',link:'https://search.bilibili.com/all?keyword=TED演讲技巧'},
+  ]},
+  money:{name:'财商提升',icon:'💰',desc:'理财·副业·消费',col:'linear-gradient(135deg,#A8E6CF,#7FD8BE)',resources:[
+    {n:'小Lin说',d:'北大+华尔街，百大UP主',link:'https://search.bilibili.com/all?keyword=小Lin说理财'},
+    {n:'金融学长',d:'学院派，新手金融框架',link:'https://search.bilibili.com/all?keyword=金融学长理财入门'},
+  ]},
+  social:{name:'社交提升',icon:'💌',desc:'高情商·人脉·恋爱',col:'linear-gradient(135deg,#FCE5EA,#FFB6C1)',resources:[
+    {n:'高情商聊天课程',d:'B站付费课程，吸引贵人',link:'https://search.bilibili.com/all?keyword=高情商聊天技巧'},
+    {n:'沈奕斐',d:'复旦副教授，女性情感洞察',link:'https://search.bilibili.com/all?keyword=沈奕斐恋爱观'},
+  ]},
+};
+
+const EXERCISES=[
+  {name:'比心',desc:'肩部训练·3组×15次',icon:'💗',search:'比心肩部训练阿新'},
+  {name:'甩锅',desc:'核心训练·3组×12次',icon:'🍳',search:'甩锅核心训练阿新'},
+  {name:'死虫式',desc:'核心训练·3组×10次',icon:'🐛',search:'死虫式核心训练跟练'},
+  {name:'左右剪刀脚',desc:'腹部训练·3组×20次',icon:'✂️',search:'剪刀脚腹肌跟练'},
+  {name:'平板支撑',desc:'核心训练·3组×45秒',icon:'📏',search:'平板支撑跟练挑战'},
+  {name:'保加利亚蹲',desc:'腿臀训练·3组×12次/侧',icon:'🦵',search:'保加利亚蹲教学跟练'},
+];
+const LEG_EXERCISES=[
+  {name:'靠墙夹球',desc:'O型腿矫正·3组×30秒',icon:'⚪',search:'O型腿矫正靠墙夹球'},
+  {name:'侧卧抬腿',desc:'大腿外侧·3组×15次/侧',icon:'🦵',search:'侧卧抬腿大腿外侧'},
+  {name:'臀桥',desc:'臀腿联动·3组×15次',icon:'🍑',search:'臀桥跟练练臀'},
+  {name:'小腿拉伸',desc:'小腿塑形·每侧30秒',icon:'💪',search:'小腿拉伸跟练'},
+];
+const CHEST_EX=[
+  {name:'跪姿俯卧撑',desc:'3组×15次·激活整个胸大肌',icon:'🙏',search:'跪姿俯卧撑丰胸跟练',tip:'双手略宽于肩，膝盖着地，缓慢下放推起'},
+  {name:'哑铃飞鸟',desc:'3组×12次·改善胸型轮廓',icon:'🕊️',search:'哑铃飞鸟女性练胸',tip:'仰卧双臂展开至肩平，夹胸收回'},
+  {name:'上斜哑铃卧推',desc:'3组×12次·上胸更挺拔',icon:'📈',search:'上斜哑铃卧推女性',tip:'板凳30-45度，推举哑铃'},
+  {name:'推墙俯卧撑',desc:'3组×20次·零基础入门',icon:'🧱',search:'推墙俯卧撑入门',tip:'站立面对墙壁，双手推墙'},
+  {name:'弹力带夹胸',desc:'3组×15次·改善集中度',icon:'🎯',search:'弹力带夹胸练胸',tip:'站姿双臂从两侧向中间夹'},
+];
+const FOODS=[
+  {icon:'🍗',name:'鸡胸肉',desc:'优质蛋白'},{icon:'🥚',name:'鸡蛋',desc:'蛋白质'},{icon:'🥛',name:'牛奶',desc:'蛋白质+钙'},
+  {icon:'🐟',name:'深海鱼',desc:'健康脂肪'},{icon:'🫘',name:'黄豆/豆浆',desc:'植物雌激素'},{icon:'🌰',name:'坚果',desc:'维E+健康脂肪'},
+  {icon:'🥑',name:'牛油果',desc:'健康脂肪'},{icon:'🍄',name:'银耳',desc:'胶原蛋白'},
+];
+
+const EXAM_TEACHER=`
+  <div class="card"><div class="card-title">📅 2026下半年-2027教师编时间线</div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-date">2026年7月3-6日</div><div class="tl-title">笔试报名</div><div class="tl-desc">中小学教师资格考试网 ntce.neea.edu.cn</div></div>
+      <div class="tl-item"><div class="tl-date">2026年9月12日</div><div class="tl-title">笔试考试</div><div class="tl-desc">教育综合知识+学科专业知识</div></div>
+      <div class="tl-item"><div class="tl-date">2026年12月9-10日（预计）</div><div class="tl-title">面试考试</div><div class="tl-desc">备课+试讲+答辩</div></div>
+      <div class="tl-item"><div class="tl-date">2027年1月中旬</div><div class="tl-title">上半年笔试报名</div><div class="tl-desc">2027年上半年批次</div></div>
+      <div class="tl-item"><div class="tl-date">2027年3月中旬</div><div class="tl-title">上半年笔试</div><div class="tl-desc">31省统一考试</div></div>
+      <div class="tl-item"><div class="tl-date">2027年5月中旬</div><div class="tl-title">上半年面试</div><div class="tl-desc">笔试成绩2年内有效</div></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">📚 备考内容</div>
+    <div style="font-size:12px;line-height:1.7"><span class="tag tag-pink">教育学</span><span class="tag tag-mint">心理学</span><span class="tag tag-yellow">教育心理学</span><span class="tag tag-sky">教育法规</span><span class="tag tag-purple">职业道德</span><span class="tag tag-pink">学科知识</span></div>
+  </div>
+  <div class="card"><div class="card-title">📖 PDF资料（点击直接看）</div>
+    <div class="res-item"><a class="res-info" style="text-decoration:none;color:var(--text)" href="https://wenku.baidu.com/view/cc24979575c66137ee06eff9aef8941ea66e4b20.html" target="_blank"><div class="res-icon">📕</div><div class="res-info"><div class="res-name">教综知识点汇总 📎</div><div class="res-desc">百度文库在线预览，点击直接看</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://max.book118.com/html/2021/1201/8004115020004050.shtm" target="_blank"><div class="res-icon">📄</div><div class="res-info"><div class="res-name">教资《教育知识与能力》必背 📎</div><div class="res-desc">原创力文档在线预览</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://wenku.baidu.com/view/1e550cfcf124ccbff121dd36a32d7375a417c6f6.html" target="_blank"><div class="res-icon">🧠</div><div class="res-info"><div class="res-name">教资教育综合试题与答案 📎</div><div class="res-desc">百度文库在线预览，含答案</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://www.renrendoc.com/paper/430902433.html" target="_blank"><div class="res-icon">📝</div><div class="res-info"><div class="res-name">教资全册知识点梳理 📎</div><div class="res-desc">人人文库在线预览</div></div></a></div>
+  </div>
+  <div class="card"><div class="card-title">🎥 B站课程（点击观看）</div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=懒鬼柴柴教育心理学" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">懒鬼柴柴 ▶️</div><div class="res-desc">教育心理学带背，60min/节</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=考研你终硕教综" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">考研你终硕 ▶️</div><div class="res-desc">教综挖空记忆带背</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=悦悦老师讲教招" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">悦悦老师讲教招 ▶️</div><div class="res-desc">教综3000题逐题拆解</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=一起考教师官方" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">一起考教师官方 ▶️</div><div class="res-desc">系统教资课程，面试资料丰富</div></div></a></div>
+  </div>
+  <div class="card phase-card"><div class="pc-header"><span class="pc-badge">第一阶段</span><span class="card-title" style="margin:0">基础夯实（4-6周·每日4-6h）</span></div>
+    <div style="font-size:12px;line-height:1.7">☀️ 上午2h：教育学/心理学/法规，整理思维导图<br>🌤️ 下午1h笔记+1h章节习题<br>🌙 30min复盘错题<br>📰 1h刷时政（学习强国APP）</div>
+  </div>
+  <div class="card phase-card"><div class="pc-header"><span class="pc-badge">第二阶段</span><span class="card-title" style="margin:0">强化突破（3-4周·每日6-8h）</span></div>
+    <div style="font-size:12px;line-height:1.7">⚡ 高频考点专项突破<br>📝 客观题每日100题<br>✍️ 主观题每日2道案例分析<br>📊 每周1-2套真题</div>
+  </div>
+  <div class="card phase-card"><div class="pc-header"><span class="pc-badge">第三阶段</span><span class="card-title" style="margin:0">冲刺模考（2-3周）</span></div>
+    <div style="font-size:12px;line-height:1.7">🎯 每两天1套真题，严格限时<br>🔍 查漏补缺，重刷错题本<br>🎤 面试准备：设计说课模板，录制视频打磨</div>
+  </div>
+`;
+
+const EXAM_CIVIL=`
+  <div class="card"><div class="card-title">📅 2027国考/省考时间线</div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-date">2026年10月15-24日</div><div class="tl-title">国考报名</div><div class="tl-desc">bm.scs.gov.cn，招录约3.81万人</div></div>
+      <div class="tl-item"><div class="tl-date">2026年11月28-29日</div><div class="tl-title">国考笔试</div><div class="tl-desc">行测+申论</div></div>
+      <div class="tl-item"><div class="tl-date">2026年12月上旬</div><div class="tl-title">单招省考（苏浙沪鲁等）</div><div class="tl-desc">部分省份单独组织</div></div>
+      <div class="tl-item"><div class="tl-date">2027年1-2月</div><div class="tl-title">联考省考公告</div><div class="tl-desc">20余省联考公告发布</div></div>
+      <div class="tl-item"><div class="tl-date">2027年3月中旬</div><div class="tl-title">联考省考笔试</div><div class="tl-desc">3月13日或20日左右</div></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-title">📚 备考内容</div>
+    <div style="font-size:12px;line-height:1.7"><span class="tag tag-pink">行测：常识</span><span class="tag tag-mint">言语</span><span class="tag tag-yellow">判断</span><span class="tag tag-sky">数量</span><span class="tag tag-purple">资料</span></div>
+    <div style="font-size:12px;margin-top:7px"><span class="tag tag-pink">申论：概括</span><span class="tag tag-mint">分析</span><span class="tag tag-yellow">对策</span><span class="tag tag-sky">应用文</span><span class="tag tag-purple">大作文</span></div>
+  </div>
+  <div class="card"><div class="card-title">📖 PDF资料（点击直接看）</div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://wenku.baidu.com/view/b4d1c64b9dc3d5bbfd0a79563c1ec5da51e2d630.html" target="_blank"><div class="res-icon">📕</div><div class="res-info"><div class="res-name">行测三色笔记 📎</div><div class="res-desc">百度文库在线预览</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://wenku.baidu.com/view/0c5a7d10f58583d049649b6648d7c1c708a10b3f.html" target="_blank"><div class="res-icon">📄</div><div class="res-info"><div class="res-name">2026申论三色笔记 📎</div><div class="res-desc">百度文库在线预览</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://max.book118.com/html/2025/0503/8117002101007061.shtm" target="_blank"><div class="res-icon">🧠</div><div class="res-info"><div class="res-name">2026申论三色笔记PDF 📎</div><div class="res-desc">原创力文档在线预览</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://max.book118.com/html/2025/0430/6135133142011120.shtm" target="_blank"><div class="res-icon">📝</div><div class="res-info"><div class="res-name">李梦圆25粉笔980申论笔记 📎</div><div class="res-desc">原创力文档在线预览</div></div></a></div>
+  </div>
+  <div class="card"><div class="card-title">🎥 B站课程（点击观看）</div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=公考小马哥申论" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">公考小马哥 ▶️</div><div class="res-desc">申论全题型+面试</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=大懒猫言语理解" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">大懒猫 ▶️</div><div class="res-desc">言语理解，中心理解透彻</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=青菜白玉汤判断推理" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">青菜白玉汤smk ▶️</div><div class="res-desc">判断推理，复盘细致</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=陈怀安资料分析" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">陈怀安 ▶️</div><div class="res-desc">资料分析"圣经"速成法</div></div></a></div>
+    <div class="res-item"><a style="text-decoration:none;color:var(--text);display:flex;gap:9px;align-items:center" href="https://search.bilibili.com/all?keyword=2026公务员980系统课" target="_blank"><div class="res-icon">📺</div><div class="res-info"><div class="res-name">980系统课完整版 ▶️</div><div class="res-desc">搜索"2026公务员980系统课"，全套148集</div></div></a></div>
+  </div>
+  <div class="card phase-card"><div class="pc-header"><span class="pc-badge">第1-30天</span><span class="card-title" style="margin:0">基础筑基</span></div>
+    <div style="font-size:12px;line-height:1.7">📊 资料分析(40%)>判断(25%)>言语(20%)>数量(10%)>常识(5%)<br>✍️ 申论前15天学方法，后15天积累+练字<br>🕐 全职：7:30晨读→8-11:30行测→14-17:30申论→19-22错题</div>
+  </div>
+  <div class="card phase-card"><div class="pc-header"><span class="pc-badge">第31-60天</span><span class="card-title" style="margin:0">专项强化</span></div>
+    <div style="font-size:12px;line-height:1.7">📝 行测每日限时：资料4篇(≤7min/篇)、判断30-40道<br>🔄 错题当天复盘，每周重做<br>✍️ 申论隔天1小题，每周1-2篇大作文</div>
+  </div>
+  <div class="card phase-card"><div class="pc-header"><span class="pc-badge">第61-90天</span><span class="card-title" style="margin:0">全真冲刺</span></div>
+    <div style="font-size:12px;line-height:1.7">🎯 每2天1套真题：上午9-11行测，下午14-17申论<br>⏱️ 顺序：常识(10)→言语(30)→判断(35)→资料(25)→数量(15)<br>📝 申论整理2-3套通用写作框架</div>
+  </div>
+`;
+
+const WORDS=[
+  {en:'abandon',ph:'/əˈbændən/',cn:'vt. 放弃；抛弃',ex:'Never abandon your dreams.'},
+  {en:'benefit',ph:'/ˈbenɪfɪt/',cn:'n. 益处 v. 获益',ex:'Exercise benefits your health.'},
+  {en:'consequence',ph:'/ˈkɒnsɪkwəns/',cn:'n. 后果；结果',ex:'Think about the consequences.'},
+  {en:'demonstrate',ph:'/ˈdemənstreɪt/',cn:'v. 证明；展示',ex:'Let me demonstrate how it works.'},
+  {en:'essential',ph:'/ɪˈsenʃl/',cn:'adj. 必要的',ex:'Water is essential for life.'},
+  {en:'frequent',ph:'/ˈfriːkwənt/',cn:'adj. 频繁的',ex:'He is a frequent visitor.'},
+  {en:'generate',ph:'/ˈdʒenəreɪt/',cn:'v. 产生；生成',ex:'Solar panels generate electricity.'},
+  {en:'hesitate',ph:'/ˈhezɪteɪt/',cn:'v. 犹豫；踌躇',ex:"Don't hesitate to ask."},
+  {en:'indicate',ph:'/ˈɪndɪkeɪt/',cn:'v. 表明；指示',ex:'The arrow indicates direction.'},
+  {en:'justify',ph:'/ˈdʒʌstɪfaɪ/',cn:'v. 证明...正当',ex:'How can you justify that?'},
+  {en:'lack',ph:'/læk/',cn:'n./v. 缺乏',ex:'A lack of sleep affects health.'},
+  {en:'maintain',ph:'/meɪnˈteɪn/',cn:'v. 维持；保养',ex:'Maintain a positive attitude.'},
+  {en:'negotiate',ph:'/nɪˈɡəʊʃieɪt/',cn:'v. 谈判；协商',ex:'We need to negotiate a deal.'},
+  {en:'obstacle',ph:'/ˈɒbstəkl/',cn:'n. 障碍',ex:'Overcome every obstacle.'},
+  {en:'perspective',ph:'/pəˈspektɪv/',cn:'n. 视角；观点',ex:'See it from my perspective.'},
+  {en:'qualify',ph:'/ˈkwɒlɪfaɪ/',cn:'v. 使具备资格',ex:'She qualified as a doctor.'},
+  {en:'recognize',ph:'/ˈrekəɡnaɪz/',cn:'v. 认出；承认',ex:'I didnt recognize you!'},
+  {en:'sufficient',ph:'/səˈfɪʃnt/',cn:'adj. 足够的',ex:'We have sufficient food.'},
+  {en:'tendency',ph:'/ˈtendənsi/',cn:'n. 倾向；趋势',ex:'A tendency to overspend.'},
+  {en:'unique',ph:'/juːˈniːk/',cn:'adj. 独特的',ex:'Everyone is unique.'},
+];
+
+const TRAVEL_DATA={
+  buy:[{t:'芒果干/榴莲干',d:'7-11和Big C随手买',tag:'零食'},{t:'泰式奶茶粉',d:'手标牌红茶/奶茶粉',tag:'饮品'},{t:'Herb Basics精油',d:'清迈本土草本品牌',tag:'护肤'},{t:'Snail White蜗牛霜',d:'泰国国民护肤品',tag:'护肤'},{t:'青草药膏',d:'驱蚊止痒神器',tag:'药品'},{t:'泰北手工布包',d:'JJ Market扎染布包',tag:'手作'},{t:'大象主题周边',d:'钥匙扣、冰箱贴',tag:'纪念品'},{t:'手工香薰蜡烛',d:'带清迈的味道回家',tag:'香氛'}],
+  wear:[{t:'速干T恤',d:'闷热潮湿，速干材质是王道',tag:'上衣'},{t:'短裤/短裙',d:'日常穿搭，清凉方便',tag:'下装'},{t:'轻薄长裤/长裙',d:'进寺庙必须遮住膝盖！',tag:'寺庙'},{t:'防晒衫/薄外套',d:'防晒+冷气房御寒',tag:'外套'},{t:'凉拖/防水凉鞋',d:'雨天主角！别穿帆布鞋',tag:'鞋子'},{t:'折叠伞+雨衣',d:'雨季标配，包里常备',tag:'雨具'}],
+  pack:[{t:'高倍防晒霜',d:'紫外线强，阴天也要涂',tag:'必备'},{t:'强力驱蚊液',d:'雨季蚊虫多',tag:'必备'},{t:'肠胃药',d:'泰餐酸辣生冷',tag:'药品'},{t:'防水手机袋',d:'雨天/水上项目',tag:'电子'},{t:'护照+复印件',d:'原件随身带',tag:'证件'},{t:'现金（泰铢）',d:'夜市/小摊用现金',tag:'财务'}],
+  spot:[{t:'塔佩门 🕊️',d:'古城地标，清晨喂鸽子'},{t:'双龙寺 ⛰️',d:'俯瞰清迈全景'},{t:'契迪龙寺 🏛️',d:'古城最震撼寺庙'},{t:'宁曼路 ☕',d:'小资咖啡馆+文创店'},{t:'JJ Market 🎪',d:'周末文艺集市'},{t:'Chom Cafe 🧚',d:'仙境绿植餐厅'},{t:'周日夜市 🌙',d:'清迈最大夜市'}],
+  food:[{t:'咖喱面 🍜',d:'泰北招牌！米其林老店'},{t:'芒果糯米饭 🥭',d:'甜糯香浓'},{t:'凤飞飞猪脚饭 🍖',d:'北门夜市传奇'},{t:'清迈香肠 🌭',d:'泰北草本猪肉肠'},{t:'香蕉煎饼 🥞',d:'街边甜品'},{t:'椰子冰淇淋 🍦',d:'清甜解暑'}],
+};
+
+const LESSON_PLAN=`<div class="card"><div class="card-title">📋 第一课《丰富的社会生活》</div><div class="card-sub">第一单元·2024人教版·八年级上册</div><div style="font-size:12px;line-height:1.7;margin-top:7px"><b>第一框：</b>1.1 认识社会生活<br><b>第二框：</b>1.2 我们都是社会的一员</div></div><div class="card"><div class="card-title">🎯 教学目标（核心素养）</div><div style="font-size:12px;line-height:1.8"><span class="tag tag-pink">政治认同</span>培养家国情怀<br><span class="tag tag-mint">道德修养</span>培养亲社会行为<br><span class="tag tag-yellow">健全人格</span>理解个人与社会关系<br><span class="tag tag-sky">责任意识</span>关心融入服务社会</div></div><div class="card"><div class="card-title">📌 重难点</div><div style="font-size:12px;line-height:1.7"><b>重点：</b>社会生活特点；个人与社会关系<br><b>难点：</b>身份在社会关系中确定；公共性维护</div></div><div class="card"><div class="card-title">📖 教学过程</div><div style="font-size:12px;line-height:1.7"><b>第一框·导入：</b>2025.9.3大阅兵议题<br><b>新课：</b>①社会生活表现 ②特点ABC（丰富/变化/公共性）<br><b>活动：</b>"小志的一天"+社会变迁对比<br><b>第二框·导入：</b>雷锋名言<br><b>新课：</b>①个人与社会关系 ②社会关系三类型（血缘/地缘/业缘）<br><b>活动：</b>绘制社会关系网络图</div></div><div class="card"><div class="card-title">📰 时政素材</div><div style="font-size:12px;line-height:1.8">🎖️ 2025.9.3大阅兵<br>🚀 神舟十九号返回<br>⚓ 福建舰<br>🏘️ 社区便民服务点</div></div>`;
+const LESSON_PPT=`<div class="card" style="background:linear-gradient(135deg,var(--sky-light),var(--purple));text-align:center"><div style="font-weight:800;font-size:13px">🖥️ PPT结构（共27页）</div></div><div class="card"><div style="font-size:12px;line-height:2">P1 封面：第一课 丰富的社会生活<br>P2 本册概况/单元知识结构图<br>P3 素养目标（政治认同/道德修养/健全人格/责任意识）<br>P4 课前预习导航（4个问题）<br>P5-6 导入：2025.9.3大阅兵议题<br>P7-8 社会生活表现（5个场景）<br>P9-14 特点A丰富/B变化/C公共性<br>P15-16 维护公共性+对青少年要求<br>P17 第一框小结<br>P18-24 第二框：个人与社会关系+社会关系类型<br>P25-27 课堂小结+随堂检测+启思导行</div></div>`;
+const LESSON_EXERCISE=`<div class="card"><div class="card-title">✏️ 选择题</div><div style="font-size:12px;line-height:1.8;margin-bottom:12px"><b>1.</b> 神舟十九号航天员的社会关系属于（ ）<br>A.血缘 B.地缘 C.业缘 D.合作<br><span style="color:var(--green);font-weight:700">✅ C（同事=业缘关系）</span></div><div style="font-size:12px;line-height:1.8"><b>2.</b> 社区便民服务点反映了（ ）<br>A.享受便利就是合格成员 B.从社会获得物质和精神滋养<br>C.减少违法=宜居 D.交往形成关系<br><span style="color:var(--green);font-weight:700">✅ B</span></div></div><div class="card"><div class="card-title">📝 材料分析题</div><div style="font-size:12px;line-height:1.8"><b>材料：</b>"小志的一天"（晨练/买菜/志愿/看电影）<br><b>(1)</b> 了解社会生活的方式？<br><span style="color:var(--text-light)">参考：亲身实践、人际交往、大众传媒</span><br><b>(2)</b> 参与社会生活对青少年的意义？<br><span style="color:var(--text-light)">参考：①丰富知识②锻炼能力③培养亲社会行为④促进全面发展</span></div></div>`;
+
+const BOOKS={
+  心理:[{e:'🧠',t:'也许你该找个人聊聊',a:'洛莉·戈特利布',d:'温暖幽默的心理咨询师故事。',ad:'情绪低落时读，每个人都有自己的战场。',col:'#E0D4F5',link:'https://weread.qq.com/web/reader/16832d80726d70b6168b11e'},{e:'🌈',t:'被讨厌的勇气',a:'岸见一郎',d:'阿德勒心理学，自由人生哲学。',ad:'总在意别人看法？这本书给你力量。',col:'#E0D4F5',link:'https://weread.qq.com/web/reader/8b9329607186dc198b9bdab'},{e:'💝',t:'蛤蟆先生去看心理医生',a:'罗伯特·戴博德',d:'童话外壳下的心理疗愈之旅。',ad:'轻松好读的心理学入门。',col:'#E0D4F5',link:'https://weread.qq.com/web/reader/66832530721e777066806c9'}],
+  情绪:[{e:'🌊',t:'情绪急救',a:'盖伊·温奇',d:'应对拒绝、孤独等心理伤害。',ad:'情绪受伤时别硬扛，像处理伤口一样处理。',col:'#FCE5EA',link:'https://weread.qq.com/web/reader/cd6327d0715aa36ccd6a55e'},{e:'🍃',t:'臣服实验',a:'迈克尔·辛格',d:'放下抗拒，顺应生命之流。',ad:'焦虑失控时，学会"臣服"获得自由。',col:'#FCE5EA',link:'https://weread.qq.com/web/bookDetail/f5a32ac0811e3bd4eg010b2e'}],
+  恋爱:[{e:'💘',t:'爱的五种语言',a:'盖瑞·查普曼',d:'读懂爱的密码，感情更甜蜜。',ad:'了解伴侣的"爱语"是升温关键。',col:'#FFE5B4',link:'https://weread.qq.com/web/reader/dcd32a30813ab8607g013ca6'},{e:'💌',t:'亲密陷阱',a:'埃丝特·佩瑞尔',d:'长久关系中的欲望与亲密平衡。',ad:'亲密和欲望矛盾，这本书教兼顾。',col:'#FFE5B4',link:'https://weread.qq.com/web/reader/b553298071a3f6e4b55d11c'}],
+  成长:[{e:'🌱',t:'原子习惯',a:'詹姆斯·克利尔',d:'微小改变带来巨大成就。',ad:'每天进步1%，一年后脱胎换骨。',col:'#D8F4E8',link:'https://weread.qq.com/web/reader/bcb32150719afe3bbcbad52'},{e:'🚀',t:'心流',a:'米哈里·契克森',d:'找到最优体验，活出充实人生。',ad:'在"心流"状态，时间消失，幸福出现。',col:'#D8F4E8',link:'https://weread.qq.com/web/reader/65e328b05e10e265eb76e03'}],
+  职场:[{e:'💼',t:'非暴力沟通',a:'马歇尔·卢森堡',d:'学会爱的语言，职场更有温度。',ad:'职场冲突90%是沟通问题。',col:'#D6EAF7',link:'https://weread.qq.com/web/reader/b7d32470813ab7e0eg015e3f'},{e:'📈',t:'高效能人士七个习惯',a:'史蒂芬·柯维',d:'职场进阶经典方法论。',ad:'从依赖到独立到互赖的成长地图。',col:'#D6EAF7',link:'https://weread.qq.com/web/reader/56d325907203e8a856def7f'}],
+  口才:[{e:'🎤',t:'关键对话',a:'科里·帕特森',d:'高风险情境下有效沟通。',ad:'面试、谈判、提需求必读。',col:'#FFE9CC',link:'https://weread.qq.com/web/bookDetail/3c632c10813ab7afbg016b8f'},{e:'🗣️',t:'演讲的力量',a:'克里斯·安德森',d:'TED掌门人教你演讲。',ad:'公开表达终极指南。',col:'#FFE9CC',link:'https://weread.qq.com/web/reader/1b5329305cc7881b5f2da82'}],
+  朋友:[{e:'🤝',t:'如何赢得朋友',a:'戴尔·卡耐基',d:'人际关系经典，历久弥新。',ad:'真诚是最高级的社交技巧。',col:'#E0D4F5',link:'https://weread.qq.com/web/reader/7c832490813aba03ag011438'},{e:'🌸',t:'关键影响力',a:'约瑟夫·格雷尼',d:'让别人心甘情愿的沟通术。',ad:'职场+亲密关系都用得上。',col:'#E0D4F5',link:'https://weread.qq.com/web/bookDetail/e36327c071a3f6e4b55d11c'}],
+};
+
+/* ===== 工具 ===== */
+const load=(k,def)=>{try{const v=localStorage.getItem('mm_'+k);return v?JSON.parse(v):def}catch(e){return def}};
+const save=(k,v)=>{try{localStorage.setItem('mm_'+k,JSON.stringify(v))}catch(e){}};
+const todayKey=()=>{const d=new Date();return`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`};
+const fmtDate=(d)=>{const w=['日','一','二','三','四','五','六'];return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 · 周${w[d.getDay()]}`};
+const fmtShortDate=(d)=>`${d.getMonth()+1}月${d.getDate()}日`;
+
+/* ===== 启动页 ===== */
+function initSplash(){
+  const now=new Date();
+  document.getElementById('splashDate').textContent=fmtDate(now);
+  const q=SOUPS[Math.floor(Math.random()*SOUPS.length)];
+  document.getElementById('splashQuote').textContent='“'+q.t+'” — '+q.f;
+  // home quote
+  document.getElementById('homeQuote').textContent='“'+q.t+'”';
+  document.getElementById('homeSub').textContent=fmtShortDate(now)+' · '+['好心情','专注','温柔有力','闪闪发光','慢慢来'][now.getDate()%5];
+  document.getElementById('homeDate').textContent=fmtDate(now);
+  document.getElementById('topDate').textContent=fmtShortDate(now);
+  // auto close after 2.2s for returning users
+  if(localStorage.getItem('mm_seen')==='1'){
+    setTimeout(()=>closeSplash(),800);
+  }
+  localStorage.setItem('mm_seen','1');
+}
+function closeSplash(){document.getElementById('splash').classList.add('hide');setTimeout(()=>document.getElementById('splash').style.display='none',500);}
+
+/* ===== 侧栏 ===== */
+function renderNav(){
+  document.getElementById('nav').innerHTML=NAV.map(n=>`
+    <div class="nav-item" data-page="${n.id}" onclick="gotoPage('${n.id}')">
+      <img class="ni-icon" src="${n.icon}" alt="">
+      <div class="ni-text">${n.name}<small>${n.sub}</small></div>
+    </div>`).join('');
+}
+function toggleSidebar(){
+  document.getElementById('mask').classList.toggle('show');
+  document.getElementById('sidebar').classList.toggle('show');
+}
+function gotoPage(id){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('.nav-item[data-page="'+id+'"]')?.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('topTitle').textContent=NAV.find(n=>n.id===id).name;
+  document.getElementById('topIcon').src=NAV.find(n=>n.id===id).icon;
+  document.querySelector('.main').scrollTop=0;
+  if(document.getElementById('sidebar').classList.contains('show')) toggleSidebar();
+  if(id==='home') renderHome();
+}
+
+/* ===== 首页：打卡 ===== */
+const CHECKINS=[
+  {id:'wake',name:'早起',icon:'🌅'},
+  {id:'sleep',name:'早睡',icon:'🌙'},
+  {id:'exer',name:'运动',icon:'🏃'},
+  {id:'tea',name:'养生茶',icon:'🍵'},
+];
+function renderCheckins(){
+  const c=load('checkin_'+todayKey(),{});
+  document.getElementById('checkinGrid').innerHTML=CHECKINS.map(x=>{
+    const on=!!c[x.id];
+    return `<div class="checkin-item ${on?'done':''}" onclick="toggleCheckin('${x.id}')">
+      <span class="ci-icon">${x.icon}</span>
+      <span class="ci-name">${x.name}</span>
+      <span class="ci-status">${on?'✓ 已打卡':'未打卡'}</span>
+    </div>`;
+  }).join('');
+}
+function toggleCheckin(id){
+  const c=load('checkin_'+todayKey(),{});
+  c[id]=!c[id];
+  save('checkin_'+todayKey(),c);
+  renderCheckins();
+  if(c[id]) confetti();
+}
+function renderHome(){
+  renderCheckins();
+  const now=new Date();
+  const y=now.getFullYear();
+  let t1=new Date(`${y}-08-09`);if(t1<now)t1=new Date(`${y+1}-08-09`);
+  let t2=new Date(`${y}-08-31`);if(t2<now)t2=new Date(`${y+1}-08-31`);
+  document.getElementById('cdThailand').textContent=Math.ceil((t1-now)/86400000)+'天';
+  document.getElementById('cdAug31').textContent=Math.ceil((t2-now)/86400000)+'天';
+}
+
+/* ===== 任务 ===== */
+function renderTasks(){
+  const today=todayKey();const data=load('tasks_'+today,[]);
+  document.getElementById('taskList').innerHTML=data.length===0?'<div style="text-align:center;padding:18px;color:var(--text-light);font-size:12px">🌸 还没有任务，快添加吧～</div>':data.map((t,i)=>`<div class="task-item ${t.done?'done':''}"><div class="task-check ${t.done?'done':''}" onclick="toggleTask(${i})">${t.done?'✓':''}</div>${t.time?`<span class="task-time">⏰${t.time}</span>`:''}<span class="ti-text" style="flex:1;font-size:13px;font-weight:600">${t.text}</span><span class="task-del" onclick="delTask(${i})">✕</span></div>`).join('');
+  const done=data.filter(t=>t.done).length;
+  document.getElementById('taskProgress').style.width=(data.length?done/data.length*100:0)+'%';
+  document.getElementById('taskProgressText').textContent=`${done}/${data.length}`;
+  document.getElementById('kbToday').innerHTML=data.slice(0,3).map(t=>`<div class="kanban-card">${t.done?'✅':'⬜'} ${t.text}</div>`).join('')||'<div class="kanban-card" style="color:var(--text-light)">暂无</div>';
+  document.getElementById('kbWeek').innerHTML='<div class="kanban-card">📅 备课</div><div class="kanban-card">📅 背单词</div><div class="kanban-card">📅 运动</div>';
+  document.getElementById('kbLong').innerHTML='<div class="kanban-card">🎯 考教师编</div><div class="kanban-card">🎯 考公上岸</div>';
+}
+function addTask(){const i=document.getElementById('taskInput'),t=document.getElementById('taskTime');if(!i.value.trim())return;const d=load('tasks_'+todayKey(),[]);d.push({text:i.value.trim(),time:t.value,done:false});save('tasks_'+todayKey(),d);i.value='';t.value='';renderTasks();confetti()}
+function toggleTask(i){const d=load('tasks_'+todayKey(),[]);d[i].done=!d[i].done;save('tasks_'+todayKey(),d);renderTasks();if(d[i].done)confetti()}
+function delTask(i){const d=load('tasks_'+todayKey(),[]);d.splice(i,1);save('tasks_'+todayKey(),d);renderTasks()}
+
+/* ===== 饮食 ===== */
+let currentMeal='早';
+function switchMeal(el,m){currentMeal=m;document.querySelectorAll('.meal-tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderMeal()}
+function renderMeal(){
+  const m=load('meal_'+todayKey()+'_'+currentMeal,[]);
+  document.getElementById('mealList').innerHTML=m.length===0?'<div style="color:var(--text-light);text-align:center;padding:10px">还没有记录 ✏️</div>':m.map(x=>`<div style="padding:5px 0;border-bottom:1px solid #F0F4F7">· ${x}</div>`).join('');
+}
+function addMeal(){const i=document.getElementById('mealInput');if(!i.value.trim())return;const m=load('meal_'+todayKey()+'_'+currentMeal,[]);m.push(i.value.trim());save('meal_'+todayKey()+'_'+currentMeal,m);i.value='';renderMeal();confetti()}
+function renderWater(){
+  const n=load('water_'+todayKey(),0);
+  document.getElementById('waterCount').textContent=`${n}/8 杯`;
+  document.getElementById('waterGrid').innerHTML=Array.from({length:8},(_,i)=>`<div class="water-cup ${i<n?'filled':''}" onclick="toggleWater(${i})">${i<n?'💧':'＋'}</div>`).join('');
+}
+function toggleWater(i){
+  const n=load('water_'+todayKey(),0);
+  const newN=(i+1)===n?i:i+1;
+  save('water_'+todayKey(),newN);
+  renderWater();
+}
+function renderFoods(){
+  document.getElementById('foodGrid').innerHTML=FOODS.map(f=>`<div class="food-item"><div class="fi-icon">${f.icon}</div><div class="fi-name">${f.name}</div><div class="fi-desc">${f.desc}</div></div>`).join('');
+}
+
+/* ===== 提升 ===== */
+function renderUplift(){
+  document.getElementById('upliftGrid').innerHTML=Object.entries(UPLIFT).map(([k,v])=>`<div class="uplift-card" style="background:${v.col}" onclick="selectUplift('${k}')"><div class="uc-icon">${v.icon}</div><div class="uc-name">${v.name}</div><div class="uc-desc">${v.desc}</div></div>`).join('');
+}
+function selectUplift(k){
+  document.querySelectorAll('.uplift-card').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  const v=UPLIFT[k];
+  document.getElementById('upliftDetail').innerHTML=`<div class="card" style="background:${v.col};text-align:center;padding:14px"><div style="font-size:30px">${v.icon}</div><div style="font-weight:800;font-size:14px;margin:4px 0">${v.name}</div><div style="font-size:11px;color:var(--text-light)">${v.desc}</div></div>${v.resources.map(r=>`<div class="res-item"><div class="res-icon">${v.icon}</div><div class="res-info"><div class="res-name">${r.n}</div><div class="res-desc">${r.d}</div><a class="ei-link" href="${r.link}" target="_blank">▶️ 立即了解</a></div></div>`).join('')}`;
+  document.getElementById('upliftDetail').classList.add('show');
+}
+
+/* ===== 考试 ===== */
+function switchExam(t,el){document.querySelectorAll('.ex-tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.querySelectorAll('.exam-content').forEach(x=>x.classList.remove('show'));document.getElementById('exam-'+t).classList.add('show')}
+function renderExam(){document.getElementById('exam-teacher').innerHTML=EXAM_TEACHER;document.getElementById('exam-civil').innerHTML=EXAM_CIVIL}
+
+/* ===== 英语 ===== */
+let wordIdx=0;
+function renderWord(){
+  const w=WORDS[wordIdx%WORDS.length];
+  document.getElementById('wordEn').textContent=w.en;
+  document.getElementById('wordPh').textContent=w.ph;
+  document.getElementById('wordCn').textContent=w.cn;
+  document.getElementById('wordEx').textContent='"'+w.ex+'"';
+  const td=load('wordToday_'+todayKey(),0),tot=load('wordTotal',0);
+  document.getElementById('wsToday').textContent=td;
+  document.getElementById('wsTotal').textContent=tot;
+  document.getElementById('wsStreak').textContent=load('wordStreak',0);
+  document.getElementById('wordProgress').style.width=Math.min(tot/3000*100,100)+'%';
+}
+function prevWord(){wordIdx--;renderWord()}
+function nextWord(){wordIdx++;renderWord()}
+function speakWord(){const w=WORDS[wordIdx%WORDS.length];const u=new SpeechSynthesisUtterance(w.en);u.lang='en-GB';u.rate=0.9;speechSynthesis.speak(u)}
+function speakWordSlow(){const w=WORDS[wordIdx%WORDS.length];const u=new SpeechSynthesisUtterance(w.en);u.lang='en-GB';u.rate=0.5;speechSynthesis.speak(u)}
+function markWord(){save('wordToday_'+todayKey(),load('wordToday_'+todayKey(),0)+1);save('wordTotal',load('wordTotal',0)+1);save('wordStreak',load('wordStreak',0)+1);wordIdx++;renderWord();confetti()}
+
+/* ===== 运动 ===== */
+function renderExercise(){
+  const days=['一','二','三','四','五','六','日'];const ti=(new Date().getDay()||7)-1;
+  document.getElementById('exerciseDays').innerHTML=days.map((d,i)=>`<div class="ex-day ${i===ti?'active':''}">${i===ti?'✓':''}<br>周${d}</div>`).join('');
+  const ex=load('ex_'+todayKey(),{strength:Array(EXERCISES.length).fill(false),leg:Array(LEG_EXERCISES.length).fill(false)});
+  document.getElementById('strengthList').innerHTML=EXERCISES.map((e,i)=>`<div class="exercise-item"><div class="ei-thumb">${e.icon}</div><div class="ei-info"><div class="ei-name">${e.name}</div><div class="ei-desc">${e.desc}</div><a class="ei-link" href="https://search.bilibili.com/all?keyword=${e.search}" target="_blank">▶️ B站跟练</a></div><div class="exercise-check ${ex.strength[i]?'done':''}" onclick="toggleStrength(${i})">${ex.strength[i]?'✓':''}</div></div>`).join('');
+  document.getElementById('legList').innerHTML=LEG_EXERCISES.map((e,i)=>`<div class="exercise-item"><div class="ei-thumb" style="background:linear-gradient(135deg,var(--sky),var(--sky-light))">${e.icon}</div><div class="ei-info"><div class="ei-name">${e.name}</div><div class="ei-desc">${e.desc}</div><a class="ei-link" href="https://search.bilibili.com/all?keyword=${e.search}" target="_blank">▶️ B站跟练</a></div><div class="exercise-check ${ex.leg[i]?'done':''}" onclick="toggleLeg(${i})">${ex.leg[i]?'✓':''}</div></div>`).join('');
+  updateExProgress();
+}
+function toggleStrength(i){const ex=load('ex_'+todayKey(),{strength:Array(EXERCISES.length).fill(false),leg:Array(LEG_EXERCISES.length).fill(false)});ex.strength[i]=!ex.strength[i];save('ex_'+todayKey(),ex);renderExercise();if(ex.strength[i])confetti()}
+function toggleLeg(i){const ex=load('ex_'+todayKey(),{strength:Array(EXERCISES.length).fill(false),leg:Array(LEG_EXERCISES.length).fill(false)});ex.leg[i]=!ex.leg[i];save('ex_'+todayKey(),ex);renderExercise();if(ex.leg[i])confetti()}
+function updateExProgress(){
+  const ex=load('ex_'+todayKey(),{strength:Array(EXERCISES.length).fill(false),leg:Array(LEG_EXERCISES.length).fill(false)});
+  const tot=EXERCISES.length+LEG_EXERCISES.length;
+  const done=ex.strength.filter(x=>x).length+ex.leg.filter(x=>x).length;
+  document.getElementById('exProgress').style.width=(done/tot*100)+'%';
+  document.getElementById('exProgressText').textContent=`${done}/${tot}`;
+}
+function playVoiceReminder(){const u=new SpeechSynthesisUtterance('今天也要记得运动哦！坚持就是胜利，Ruby你最美了！');u.lang='zh-CN';u.rate=1;speechSynthesis.speak(u);confetti()}
+
+/* ===== 备课 ===== */
+function switchLesson(t,el){document.querySelectorAll('.lt').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('lessonContent').innerHTML={plan:LESSON_PLAN,ppt:LESSON_PPT,exercise:LESSON_EXERCISE}[t]}
+function renderLesson(){switchLesson('plan',document.querySelector('.lt'))}
+
+/* ===== 鸡汤 ===== */
+let soupIdx=0;
+function renderSoup(){const s=SOUPS[soupIdx];document.getElementById('soupText').textContent='"'+s.t+'"';document.getElementById('soupFrom').textContent='— '+s.f;document.getElementById('soupIcon').textContent=['🌷','🌸','🌺','🌻','🌼','🌟','💫','🌈','🍀','☀️','🌙'][soupIdx%11];}
+function nextSoup(){soupIdx=(soupIdx+1)%SOUPS.length;renderSoup();confetti()}
+function prevSoup(){soupIdx=(soupIdx-1+SOUPS.length)%SOUPS.length;renderSoup()}
+function toggleFav(){
+  const s=SOUPS[soupIdx];
+  const favs=load('favs',[]);
+  const ix=favs.findIndex(x=>x.t===s.t);
+  if(ix>=0) favs.splice(ix,1);
+  else favs.push(s);
+  save('favs',favs);
+  renderFavs();
+  confetti();
+}
+function renderFavs(){
+  const favs=load('favs',[]);
+  document.getElementById('favList').innerHTML=favs.length===0?'<div style="color:var(--text-light);text-align:center;padding:10px">还没有收藏的句子～</div>':favs.map((s,i)=>`<div style="padding:8px 0;border-bottom:1px solid #F0F4F7"><div style="font-weight:600">${s.t}</div><div style="font-size:10px;color:var(--text-light);margin-top:2px">— ${s.f} <span style="color:var(--pink);cursor:pointer;float:right" onclick="removeFav(${i})">删除</span></div></div>`).join('');
+}
+function removeFav(i){const favs=load('favs',[]);favs.splice(i,1);save('favs',favs);renderFavs()}
+
+/* ===== 书籍 ===== */
+function renderBooks(){const cats=Object.keys(BOOKS);document.getElementById('bookCatTabs').innerHTML=cats.map((c,i)=>`<div class="bct ${i===0?'active':''}" onclick="switchBook('${c}',this)">${c}</div>`).join('');switchBook(cats[0],document.querySelector('.bct'))}
+function switchBook(cat,el){document.querySelectorAll('.bct').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.getElementById('bookList').innerHTML=BOOKS[cat].map(b=>`<div class="book-card"><div class="book-cover" style="background:${b.col}">${b.e}</div><div class="book-info"><div class="bi-title">${b.t}</div><div class="bi-author">${b.a}</div><div class="bi-desc">${b.d}</div><div class="bi-advice">💡 ${b.ad}</div><a class="bi-link" href="${b.link}" target="_blank">📖 微信读书在线阅读 →</a></div></div>`).join('')}
+
+/* ===== 胸部 ===== */
+function renderChest(){
+  document.getElementById('chestExList').innerHTML=CHEST_EX.map(e=>`<div class="exercise-item"><div class="ei-thumb" style="background:linear-gradient(135deg,var(--pink),var(--pink-soft))">${e.icon}</div><div class="ei-info"><div class="ei-name">${e.name}</div><div class="ei-desc">${e.desc}</div><div style="font-size:10px;color:var(--text-light);margin-top:2px">${e.tip}</div><a class="ei-link" href="https://search.bilibili.com/all?keyword=${e.search}" target="_blank">▶️ B站跟练</a></div></div>`).join('');
+  document.getElementById('chestFoodGrid').innerHTML=FOODS.map(f=>`<div class="food-item"><div class="fi-icon">${f.icon}</div><div class="fi-name">${f.name}</div><div class="fi-desc">${f.desc}</div></div>`).join('');
+}
+
+/* ===== 撒花 ===== */
+function confetti(){
+  const e=['🎉','✨','🌟','💫','🎊','🌸','⭐','💖','🌷','🎀'];
+  for(let i=0;i<8;i++){
+    const el=document.createElement('div');
+    el.className='confetti';
+    el.textContent=e[Math.floor(Math.random()*e.length)];
+    el.style.left=Math.random()*100+'vw';
+    el.style.animationDelay=Math.random()*0.3+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2000);
+  }
+}
+
+/* ===== 初始化 ===== */
+function init(){
+  renderNav();
+  renderHome();
+  renderTasks();
+  renderMeal();
+  renderWater();
+  renderFoods();
+  renderUplift();
+  renderExam();
+  renderWord();
+  renderExercise();
+  renderLesson();
+  renderSoup();
+  renderFavs();
+  renderBooks();
+  renderChest();
+  setInterval(()=>{
+    const now=new Date();
+    if(document.getElementById('page-home').classList.contains('active')){
+      document.getElementById('topDate').textContent=fmtShortDate(now);
+    }
+  },60000);
+}
+initSplash();
+window.addEventListener('load',init);
+</script>
+</body>
+</html>
