@@ -6,10 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Ruby的工作台">
+<meta name="apple-mobile-web-app-title" content="麦麦的工作台">
 <meta name="theme-color" content="#EAF4FA">
 <meta name="format-detection" content="telephone=no">
-<title>Ruby 的工作台 · Ruby's Workbench</title>
+<title>麦麦的工作台 · Maimai's Workbench</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -354,12 +354,12 @@ button{font-family:inherit;min-height:36px;}
   <div class="sidebar-header">
     <img src="assets/dimoo-home.png" alt="">
     <div>
-      <h2>Ruby 的工作台</h2>
-      <p>RUBY'S WORKBENCH · 2026</p>
+      <h2>麦麦的工作台</h2>
+      <p>MAIMAI'S WORKBENCH · 2026</p>
     </div>
   </div>
   <nav class="sidebar-nav" id="nav"></nav>
-  <div class="sidebar-footer">Dimoo × 星星人 陪你努力 · v5.0</div>
+  <div class="sidebar-footer">Dimoo × 星星人 陪你努力 · v5.1</div>
 </aside>
 
 <!-- ===== 顶栏 ===== -->
@@ -1012,8 +1012,8 @@ const BOOKS={
 };
 
 /* ================= 工具 ================= */
-const load=(k,def)=>{try{const v=localStorage.getItem('rb_'+k);return v?JSON.parse(v):def}catch(e){return def}};
-const save=(k,v)=>{try{localStorage.setItem('rb_'+k,JSON.stringify(v))}catch(e){}};
+const load=(k,def)=>{try{const v=localStorage.getItem('mm_'+k);return v?JSON.parse(v):def}catch(e){return def}};
+const save=(k,v)=>{try{localStorage.setItem('mm_'+k,JSON.stringify(v))}catch(e){}};
 const todayKey=()=>{const d=new Date();return`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`};
 const dateKey=d=>`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 const WEEK_CN=['日','一','二','三','四','五','六'];
@@ -1031,8 +1031,8 @@ function initSplash(){
  document.getElementById('heroDate').textContent=fmtDate(now);
  document.getElementById('topDate').textContent=fmtShort(now);
  document.getElementById('soupDate').textContent=fmtShort(now);
- if(localStorage.getItem('rb_seen')==='1'){setTimeout(closeSplash(),0);setTimeout(closeSplash,900);}else{setTimeout(closeSplash,3500);}
- localStorage.setItem('rb_seen','1');
+ if(localStorage.getItem('mm_seen')==='1'){setTimeout(closeSplash(),0);setTimeout(closeSplash,900);}else{setTimeout(closeSplash,3500);}
+ localStorage.setItem('mm_seen','1');
 }
 function closeSplash(){document.getElementById('splash').classList.add('hide');setTimeout(()=>{document.getElementById('splash').style.display='none'},500);}
 

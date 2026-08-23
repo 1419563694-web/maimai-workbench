@@ -1,6 +1,6 @@
 {
-  "name": "Ruby的工作台",
-  "short_name": "Ruby工作台",
+  "name": "麦麦的工作台",
+  "short_name": "麦麦工作台",
   "description": "Ruby 的个人工作台 - 11个模块，Dimoo美食主题陪伴",
   "start_url": "./index.html",
   "scope": "./",

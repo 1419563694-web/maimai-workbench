@@ -1,5 +1,5 @@
-/* Ruby的工作台 - Service Worker v5 */
-const CACHE = 'ruby-v5-' + Date.now();
+/* 麦麦的工作台 - Service Worker v5.1 */
+const CACHE = 'maimai-v5.1-' + Date.now();
 const ASSETS = [
   './',
   './index.html',
