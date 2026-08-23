@@ -1,5 +1,5 @@
-/* 麦麦的工作台 - Service Worker */
-const CACHE = 'maimai-v4-' + Date.now();
+/* Ruby的工作台 - Service Worker v5 */
+const CACHE = 'ruby-v5-' + Date.now();
 const ASSETS = [
   './',
   './index.html',
@@ -18,7 +18,9 @@ const ASSETS = [
   './assets/dimoo-soup.png',
   './assets/dimoo-books.png',
   './assets/dimoo-chest.png',
-  './assets/dimoo-splash.png'
+  './assets/dimoo-splash.png',
+  './assets/starr.png',
+  './assets/star-deco.png'
 ];
 
 self.addEventListener('install', e => {

@@ -1,13 +1,13 @@
 {
-  "name": "麦麦的工作台",
-  "short_name": "麦麦工作台",
-  "description": "Ruby 的个人工作台 - 11个Dimoo美食主题页面",
+  "name": "Ruby的工作台",
+  "short_name": "Ruby工作台",
+  "description": "Ruby 的个人工作台 - 11个模块，Dimoo美食主题陪伴",
   "start_url": "./index.html",
   "scope": "./",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#EAF4FA",
-  "theme_color": "#6FB3D8",
+  "theme_color": "#7FB8DF",
   "icons": [
     {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
     {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
