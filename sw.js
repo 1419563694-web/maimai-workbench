@@ -1,5 +1,5 @@
-/* 麦麦的工作台 - Service Worker v5.1 */
-const CACHE = 'maimai-v5.1-' + Date.now();
+/* 麦麦的工作台 - Service Worker v5.2 */
+const CACHE = 'maimai-v5.2-' + Date.now();
 const ASSETS = [
   './',
   './index.html',
